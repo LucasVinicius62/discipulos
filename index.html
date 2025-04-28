@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devocional - Escala + Calendário</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #e0f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    h1 {
+      color: #006064;
+      margin-bottom: 10px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .responsavel {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #00796b;
+    }
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+    .calendar-header button {
+      background-color: #004d40;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .calendar-header button:hover {
+      background-color: #00695c;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 40px);
+      grid-gap: 5px;
+    }
+    .day {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+    }
+    .lucas {
+      background-color: #2196f3;
+    }
+    .debora {
+      background-color: #e91e63;
+    }
+    .pausa {
+      background-color: #9e9e9e;
+    }
+    .legend {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Parte de cima: quem faz hoje -->
+  <div class="card">
+    <h1>Escala Discipulos</h1>
+    <div id="responsavel" class="responsavel">Carregando...</div>
+  </div>
+
+  <!-- Parte de baixo: calendário -->
+  <h1>Calendário</h1>
+
+  <div class="calendar-header">
+    <button onclick="changeMonth(-1)">⬅️</button>
+    <h2 id="monthYear"></h2>
+    <button onclick="changeMonth(1)">➡️</button>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #2196f3;"></div> Lucas Vinicius
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #e91e63;"></div> Débora
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: #9e9e9e;"></div> Pausa
+    </div>
+  </div>
+
+  <footer>Projeto discipulos Expansão - Lucas & Débora</footer>
+
+  <script>
+    const startDate = new Date('2025-04-29'); // Começa hoje!
+    startDate.setHours(0, 0, 0, 0);
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+  
+    const responsavelElement = document.getElementById('responsavel');
+    const calendarElement = document.getElementById('calendar');
+    const monthYearElement = document.getElementById('monthYear');
+  
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+  
+    function mostrarResponsavelHoje() {
+  let responsavel;
+  const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+  const cycleDay = (diffDays % 6 + 6) % 6; // Correção para sempre positivo
+
+  if (cycleDay === 0 || cycleDay === 1) {
+    responsavel = 'Lucas Vinicius ✨';
+  } else if (cycleDay === 3 || cycleDay === 4) {
+    responsavel = 'Débora ✨';
+  } else {
+    responsavel = 'Dia de Pausa ⏸️';
+  }
+
+  responsavelElement.textContent = responsavel;
+}
+
+function criarCalendario(year, month) {
+  calendarElement.innerHTML = '';
+
+  const firstDay = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  monthYearElement.textContent = firstDay.toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    const currentDate = new Date(year, month, i);
+    currentDate.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.floor((currentDate - startDate) / (1000 * 60 * 60 * 24));
+    const cycleDay = (diffDays % 6 + 6) % 6;
+    let className = 'pausa'; 
+
+    if (diffDays >= 0) {
+      if (cycleDay === 0 || cycleDay === 1) {
+        className = 'lucas';
+      } else if (cycleDay === 3 || cycleDay === 4) {
+        className = 'debora';
+      }
+    }
+
+    const dayElement = document.createElement('div');
+    dayElement.className = `day ${className}`;
+
+    if (today.getDate() === i && today.getMonth() === month && today.getFullYear() === year) {
+      dayElement.style.border = "2px solid #000"; // Destaque o dia de hoje
+    }
+
+    dayElement.textContent = i;
+    calendarElement.appendChild(dayElement);
+  }
+}
+
+  
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      criarCalendario(currentYear, currentMonth);
+    }
+  
+    mostrarResponsavelHoje();
+    criarCalendario(currentYear, currentMonth);
+  </script>
+  
+  
+
+</body>
+</html>
